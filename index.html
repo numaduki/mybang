@@ -21,11 +21,13 @@
 		<meta property="og:locale" content="ja_JP">
 		<script type="text/javascript">
 
-		var userdata_obj = JSON.parse(localStorage.getItem('mybang_userdata', ''));
+		var
+			userdata_obj = JSON.parse(localStorage.getItem('mybang_userdata', '')),
+			mybangs_init_obj = {"ｊ": "https://www.weblio.jp/content/%s","ｙ": "https://www.yodobashi.com/?word=%s","ｗ": "https://duckduckgo.com/?q=%s site:wikipedia.org&ia=web"};
 
 		if ( ! userdata_obj) {
 			userdata_obj = {};
-			userdata_obj['mybangs'] = {};
+			userdata_obj['mybangs'] = mybangs_init_obj;
 			userdata_obj['defaultengine'] = 'ddg';
 			userdata_obj['defaultengine_custom'] = '';
 		}
@@ -64,6 +66,15 @@
 					'mybang_userdata',
 					JSON.stringify(userdata_obj)
 				);
+			}
+		}
+
+		// データ消去ボタン
+		// localStorage に保存されているmybangのデータを全て削除
+		function clear_button(){
+			if (window.confirm('設定を全て削除します。続行しますか？')) {
+				localStorage.removeItem('mybang_userdata');
+				localStorage.removeItem('mybang_lastdate');
 				location.href = "./";
 			}
 		}
@@ -75,10 +86,18 @@
 				tmp.item(i).innerHTML = location.href;
 			}
 
+			tmp = document.getElementsByClassName('mybangs_init');
+			for (let i = 0; i < tmp.length; i++) {
+				tmp.item(i).innerHTML = "＜記述例＞\n\n" + JSON.stringify(mybangs_init_obj, null, 2) + "\n\n「ｊ単語」で単語を辞書検索、「ｙ商品名」で商品名をヨドバシドットコムで検索、「ｗ単語」でwikipedia.org内にあるページをDuckDuckGoで検索";
+			}
+
 		};
 
 		</script>
 		<style type="text/css">
+		:root {
+		color-scheme: light dark;
+		}
 		body {
 		margin: 0 auto;
 		padding: 2em 1em;
@@ -145,6 +164,9 @@
 		hr {
 		margin: 40px 0;
 		}
+		pre {
+		white-space: pre-wrap;
+		}
 		</style>
 	</head>
 	<body>
@@ -190,6 +212,7 @@
 				"mybang名":"URL"のペアで、JSONで記述します。検索キーワード部分は<code>%s</code>としてください。
 			</p>
 			<textarea id="yourbangsjson" cols="100" rows="20"></textarea>
+			<pre class="mybangs_init"></pre>
 			<h3>
 				2.mybang名がなかった場合の動作を決める
 			</h3><label><input type="radio" name="defaultengine" value=
@@ -210,7 +233,7 @@ Bing - https://www.bing.com/search?q=%s
 </pre>
 			<script type="text/javascript">
 
-			document.getElementById('yourbangsjson').value = JSON.stringify(userdata_obj['mybangs'], null, 4);
+			document.getElementById('yourbangsjson').value = JSON.stringify(userdata_obj['mybangs'], null, 2);
 
 			let radio_btns = document.getElementsByName('defaultengine');
 			let len = radio_btns.length;
@@ -225,8 +248,10 @@ Bing - https://www.bing.com/search?q=%s
 			</script>
 			<h3>
 				3.設定を保存する
-			</h3><button id="saveyourbangs" onclick=
-			"save_button();">設定をすべて保存</button>
+			</h3>
+			<p>
+				<button onclick="save_button();">設定をすべて保存</button>
+			</p>
 			<p>
 				設定は全てブラウザー内にのみ保存され、サーバーには保存されません（このブラウザーでしか使えません）。
 			</p>
@@ -265,6 +290,13 @@ Bing - https://www.bing.com/search?q=%s
 					</tr>
 				</tbody>
 			</table>
+			<h3>初期化（設定の削除）</h3>
+			<p>
+				<button onclick="clear_button();">設定をすべて削除</button>
+			</p>
+			<p>
+				このブラウザーに保存されているmybangの設定を全て削除します。初期化したい場合・mybangを今後利用しない場合に押してください。
+			</p>
 			<hr>
 			<h2>
 				ドキュメント

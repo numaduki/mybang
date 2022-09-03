@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<!-- 転送先にリファラを送らない -->
+		<meta name="referrer" content="no-referrer">
+		<title>
+			mybang
+		</title>
+		<link rel="search" type="application/opensearchdescription+xml" title=
+		"mybang" href="opensearch.xml">
+		<link rel="icon" href="icon.png">
+		<meta property="og:title" content="mybang">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://numaduki.github.jp/mybang/">
+		<meta property="og:image" content=
+		"https://numaduki.github.jp/mybang/ogp.png">
+		<meta property="og:description" content="Bang（DuckDuckGo）風ショートカットを作成">
+		<meta property="og:site_name" content="mybang">
+		<meta property="og:locale" content="ja_JP">
+		<script type="text/javascript">
+
+		var userdata_obj = JSON.parse(localStorage.getItem('mybang_userdata', ''));
+
+		if ( ! userdata_obj) {
+			userdata_obj = {};
+			userdata_obj['mybangs'] = {};
+			userdata_obj['defaultengine'] = 'ddg';
+			userdata_obj['defaultengine_custom'] = '';
+		}
+
+		// 保存ボタン
+		// localStorage に保存してリロードする
+		function save_button(){
+
+			let
+				no_error = true,
+				radio_btns = document.getElementsByName('defaultengine'),
+				len = radio_btns.length
+				bangs_str = document.getElementById('yourbangsjson').value
+			;
+
+			for (let i = 0; i < len; i++){
+				if (radio_btns.item(i).checked){
+					userdata_obj['defaultengine'] = radio_btns.item(i).value;
+				}
+			}
+
+			userdata_obj['defaultengine_custom'] = document.getElementsByName('defaultenginecustom').item(0).value;
+
+			// JSONにエラーがないかチェック
+			try {
+				JSON.parse(bangs_str);
+			} catch (err) {
+				no_error = false;
+				alert("入力されたJSON文字列にエラーが存在するようです。\n確認・修正して保存してください。\n\n" + err);
+			} finally {
+			}
+
+			if (no_error) {
+				userdata_obj['mybangs'] = JSON.parse(bangs_str);
+				localStorage.setItem(
+					'mybang_userdata',
+					JSON.stringify(userdata_obj)
+				);
+				location.href = "./";
+			}
+		}
+
+		window.onload = function(){
+
+			let tmp = document.getElementsByClassName('location_href');
+			for (let i = 0; i < tmp.length; i++) {
+				tmp.item(i).innerHTML = location.href;
+			}
+
+		};
+
+		</script>
+		<style type="text/css">
+		body {
+		margin: 0 auto;
+		padding: 2em 1em;
+		max-width: 800px;
+		}
+		header {
+		text-align:center;
+		}
+		h1 img {
+		width: 64px;
+		}
+		form {
+		display:flex;
+		}
+		form > input[type="text"] {
+		margin-right:10px;
+		}
+		table {
+		border-collapse: collapse;
+		}
+		table th, table td {
+		border:1px solid currentcolor;
+		padding: 0 1em;
+		}
+		h3 {
+		margin-top:2em;
+		}
+		pre {
+		font-size: 1rem;
+		}
+		textarea, input[type="text"] {
+		border-style: inset;
+		border-width: 1px;
+		padding: 10px;
+		border-radius:10px;
+		box-sizing: border-box;
+		outline: 0;
+		font-size: 1rem;
+		width: 99%;
+		}
+		textarea:focus, input[type="text"]:focus {
+		box-shadow: 0 0 0 2px currentcolor inset;
+		}
+		textarea {
+		height:15em;
+		}
+		input[type="text"] {
+		font-family: monospace;
+		height:2.5em;
+		}
+		button, input[type="submit"] {
+		padding:0 15px;
+		height:2.5em;
+		border-radius:7px;
+		font-size: 1rem;
+		letter-spacing: .05em;
+		line-height: 1;
+		position:relative;
+		cursor: pointer;
+		}
+		address {
+		text-align:right;
+		}
+		hr {
+		margin: 40px 0;
+		}
+		</style>
+	</head>
+	<body>
+		<header>
+			<h1>
+				<img src="icon.png" alt="mybang">
+			</h1>
+			<form action="./search.html" method="get">
+				<input type="text" name="q"><input type="submit" value="検索"><br>
+			</form>
+			<p>
+				または直接アクセス: <a href=
+				"search.html?q={searchTerms}"><span class="location_href"></span>search.html?q={searchTerms}</a>
+			</p>
+		</header>
+		<hr>
+		<main>
+			<h2>
+				概要
+			</h2>
+			<p>
+				自分でDuckDuckGoのBang風のショートカットを作れます。<br>
+				ただし仕様が一部（というかかなり）異なります。
+			</p>
+			<ul>
+				<li>mybang名が<strong>冒頭にある場合のみ</strong>認識します。<br>
+				</li>
+				<li>mybang名が<strong>空白含め、正確に一致した場合にのみ</strong>認識します。<br>
+				</li>
+				<li>mybang名の冒頭が「!」である必要はありません。<br>
+				</li>
+				<li>mybang名にはマルチバイト文字も使えます。（「ｇ」「ぐ」でGoogle検索などが可能）
+				</li>
+			</ul>
+			<hr>
+			<h2>
+				設定
+			</h2>
+			<h3>
+				1.mybangをつくる
+			</h3>
+			<p>
+				"mybang名":"URL"のペアで、JSONで記述します。検索キーワード部分は<code>%s</code>としてください。
+			</p>
+			<textarea id="yourbangsjson" cols="100" rows="20"></textarea>
+			<h3>
+				2.mybang名がなかった場合の動作を決める
+			</h3><label><input type="radio" name="defaultengine" value=
+			"ddg">DuckDuckGoで検索</label><br>
+			<label><input type="radio" name="defaultengine" value=
+			"google">Googleで検索</label><br>
+			<label><input type="radio" name="defaultengine" value=
+			"custom">指定するURLに移動</label><br>
+			<br>
+			指定するURL（検索キーワード部分を<code>%s</code>にして入力）:<br>
+			<input type="text" name="defaultenginecustom"><br>
+			<pre>
+＜参考＞
+DuckDuckGo 過去1年間 - https://duckduckgo.com/?q=%s&ia=web&kl=jp-jp&df=y
+DuckDuckGo HTML版 - https://html.duckduckgo.com/html/?q=%s&kl=jp-jp
+DuckDuckGo lite版 - https://lite.duckduckgo.com/lite/?q=%s&kl=jp-jp
+Bing - https://www.bing.com/search?q=%s
+</pre>
+			<script type="text/javascript">
+
+			document.getElementById('yourbangsjson').value = JSON.stringify(userdata_obj['mybangs'], null, 4);
+
+			let radio_btns = document.getElementsByName('defaultengine');
+			let len = radio_btns.length;
+			for (let i = 0; i < len; i++){
+				if (radio_btns.item(i).value == userdata_obj['defaultengine']){
+						radio_btns.item(i).checked = true;
+				}
+			}
+
+			document.getElementsByName('defaultenginecustom').item(0).value = userdata_obj['defaultengine_custom'];
+
+			</script>
+			<h3>
+				3.設定を保存する
+			</h3><button id="saveyourbangs" onclick=
+			"save_button();">設定をすべて保存</button>
+			<p>
+				設定は全てブラウザー内にのみ保存され、サーバーには保存されません（このブラウザーでしか使えません）。
+			</p>
+			<h3>
+				4.使う
+			</h3>
+			<p>
+				ウェブブラウザーに、mybangを検索エンジンとして追加することができます。（下記以外のブラウザーは普段使わないので、よくわかりません。お手数ですがお調べください）
+			</p>
+			<table>
+				<tbody>
+					<tr>
+						<th>
+							Mozilla Firefox
+						</th>
+						<td>
+							<p>
+								アドレスバーを右クリック、または検索バーを左クリックすると、追加のためのボタンが表示されます。
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<th>
+							Microsoft Edge
+						</th>
+						<td>
+							<p>
+								色々やり方はあるようですが、手動で追加するのが確実です。以下のように追加してください。
+							</p>
+							<pre>
+検索エンジン: mybang ※なんでもいい
+キーワード: mybang ※なんでもいい
+クエリの代わりに %s を使用した URL: <span class="location_href"></span>search.html?q=%s
+</pre>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<hr>
+			<h2>
+				ドキュメント
+			</h2>
+			<p>
+				もともと個人用に使うために作成・設置したものですが、もしかしたら使いたい人もいるかもしれないので、一応ドキュメントを置いておきます。
+			</p>
+			<h3>
+				ライセンス
+			</h3>
+			<p>
+				MIT Licenseです。
+			</p>
+			<h3>
+				利用について
+			</h3>このツールは自由に使っていただいてかまいません。ただし、作者のGitHub Pagesに設置してある
+			https://numaduki.github.io/mybang/ を使うのではなく、自分のGitHub
+			Pagesや、自分のマシン上のローカルサーバーで使うことをおすすめします。
+			<h3>
+				データの保存について
+			</h3>
+			<p>
+				mybangの設定データは全てブラウザー内にのみ保存され、他のウェブブラウザーと自動的に共有はできません。他のブラウザーでも使いたい場合は、手動でJSONデータ等をコピーアンドペースト（と検索エンジンとして登録）してください。
+			</p>
+			<h3>
+				その他
+			</h3>
+			<p>
+				設定によっては <a href="./search.html">search.html</a>へのリダイレクトがループする可能性があるため、ごく短い間隔でアクセスされた場合は処理を止めるようにしています。
+			</p>
+		</main>
+		<hr>
+		<footer>
+			<address>
+				©2022 numaduki
+			</address>
+		</footer>
+	</body>
+</html>

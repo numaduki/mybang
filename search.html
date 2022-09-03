@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<meta charset="utf-8">
+
+<!-- ゆるくクローラ禁止 -->
+<meta name="robots" content="noindex,nofollow,noarchive">
+<!-- 転送先にリファラを送らない -->
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="icon-small.gif">
+<title>mybang</title>
+<style type="text/css">
+	:root { color-scheme: light dark; }
+</style>
+
+<script>
+
+let
+	//start = performance.now(),
+	go_on = true,
+	userdata_obj,
+	q_decode = '',
+	bang_name,
+	cur_date
+;
+
+//設定によっては無限リダイレクトするため、簡易的に阻止
+if ((cur_date = new Date().getTime()) - localStorage.getItem('mybang_lastdate', '0') * 1 <= 250) { alert('短時間内におけるアクセスを検知したため、処理を停止しました。続行するにはこのダイアログを閉じて、ページを再読み込みしてください。');go_on = false }
+
+localStorage.setItem('mybang_lastdate', cur_date);
+
+//if (!userdata) {
+//	go_on = false;
+//	location.href = './';
+//} else {
+//	userdata_obj = JSON.parse(userdata);
+//}
+
+try {
+	userdata_obj = JSON.parse(localStorage.getItem('mybang_userdata', ''));
+} catch (err) {
+	go_on = false;
+	location.href = './';
+}
+
+
+
+//クエリを取り出す 同じキーがある場合は後の方を採用
+location.search.substring(1).split('&').forEach(function(s){
+	if (s.indexOf('q=') === 0) {
+		q_decode = decodeURIComponent(s.substring(2)).replaceAll('+', ' ');
+	}
+});
+
+//bangs = userdata_obj['mybangs'];
+//bangs = userdata_obj.mybangs;
+
+if (go_on && q_decode && userdata_obj.mybangs) {
+//if (q_decode && bangs) {
+
+	// 自分のbangを処理する
+	for (bang_name in userdata_obj.mybangs) {
+		if (q_decode.indexOf(bang_name) === 0) {
+			location.replace(userdata_obj.mybangs[bang_name].replace('%s', q_decode.substring(bang_name.length)));
+			go_on = false;
+			break;
+		}
+	}
+
+	// 検索語句を含むタイトルに変更
+	// document.title = q_decode + ' - mybang';
+
+	if (go_on) {
+		//location.replace({
+		//	'ddg': 'https://duckduckgo.com/?q=%s&ia=web',
+		//	'google': 'https://www.google.com/search?hl=ja&q=%s',
+		//	'custom': userdata_obj['defaultengine_custom']
+		//}[userdata_obj['defaultengine']].replace('%s', q_decode));
+		location.replace({
+			'ddg': 'https://duckduckgo.com/?q=%s&ia=web',
+			'google': 'https://www.google.com/search?hl=ja&q=%s',
+			'custom': userdata_obj.defaultengine_custom
+		}[userdata_obj.defaultengine].replace('%s', q_decode));
+	}
+}
+
+//let end = performance.now();
+//console.log(end - start);
+
+</script>
+
+<p>
+mybangへようこそ。ただし、ここには何もありません。<br>
+このページは、URLに含まれるクエリ文字列に応じて、リダイレクト動作をするためのページです。</p>
+<p>
+<a href="./">はじめての利用・設定ページはこちら！</a>
+</p>
+</html>

@@ -2,6 +2,6 @@
 <ShortName>mybang</ShortName>
 <Description>Search on mybang</Description>
 <InputEncoding>UTF-8</InputEncoding>
-<Image width="16" height="16" type="image/png">https://numaduki.github.io/mybang/icon.png</Image>
+<Image width="16" height="16" type="image/png">https://numaduki.github.io/mybang/icon-f.png</Image>
 <Url type="text/html" method="get" template="https://numaduki.github.io/mybang/search.html?q={searchTerms}" />
 </OpenSearchDescription>

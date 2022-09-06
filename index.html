@@ -79,9 +79,10 @@
 
 	window.onload = function(){
 
-		let tmp = document.getElementsByClassName('location_href'), i;
+		let tmp = document.getElementsByClassName('location_href'), i,
+		installed_url = location.href.substring(0, location.href.lastIndexOf('/') + 1);
 		for (i = 0; i < tmp.length; i++) {
-			tmp.item(i).innerHTML = location.href;
+			tmp.item(i).innerHTML = installed_url;
 		}
 
 		tmp = document.getElementsByClassName('mybangs_init');

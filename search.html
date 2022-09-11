@@ -39,6 +39,9 @@ location.search.substring(1).split('&').forEach(function(s){
 
 if (go_on && q_decode && userdata_obj.mybangs) {
 
+	// （mybang部分含む）検索語句を含むタイトルに変更
+	document.title = q_decode + ' - mybang';
+
 	// 自分のbangを処理する
 	for (bang_name in userdata_obj.mybangs) {
 		if (q_decode.indexOf(bang_name) === 0) {
@@ -47,9 +50,6 @@ if (go_on && q_decode && userdata_obj.mybangs) {
 			break;
 		}
 	}
-
-	// 検索語句を含むタイトルに変更
-	// document.title = q_decode + ' - mybang';
 
 	if (go_on) {
 		location.replace({

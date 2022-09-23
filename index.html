@@ -87,7 +87,7 @@
 
 		tmp = document.getElementsByClassName('mybangs_init');
 		for (i = 0; i < tmp.length; i++) {
-			tmp.item(i).innerHTML = "＜記述例＞\n\n" + JSON.stringify(mybangs_init_obj, null, 2) + "\n\n「ｊ単語」で単語を辞書検索、「ｙ商品名」で商品名をヨドバシドットコムで検索、「ｗ単語」でwikipedia.org内にあるページをDuckDuckGoで検索";
+			tmp.item(i).innerHTML = "＜例＞\n" + JSON.stringify(mybangs_init_obj, null, 2) + "\n\n「ｊ単語」で単語を辞書検索、「ｙ商品名」で商品名をヨドバシドットコムで検索、「ｗ単語」でwikipedia.org内にあるページをDuckDuckGoで検索";
 		}
 
 	};
@@ -101,9 +101,6 @@
 	margin: 0 auto;
 	padding: 2em 1em;
 	max-width: 800px;
-	}
-	header {
-	text-align:center;
 	}
 	h1 img {
 	width: 64px;
@@ -141,21 +138,36 @@
 	box-shadow: 0 0 0 2px currentcolor inset;
 	}
 	textarea {
-	height:15em;
+	height:20em;
 	}
 	input[type="text"] {
 	font-family: monospace;
 	height:2.5em;
 	}
 	button, input[type="submit"] {
-	padding:0 15px;
-	height:2.5em;
+	padding:0 30px;
+	height:3.5em;
 	border-radius:7px;
 	font-size: 1rem;
 	letter-spacing: .05em;
 	line-height: 1;
 	position:relative;
 	cursor: pointer;
+	border:none;
+	}
+	button:hover, input[type="submit"]:hover {
+	outline: 3px solid currentcolor;
+	outline-offset: -4px;
+	}
+	button:active, input[type="submit"]:active {
+		top:1px; left:1px;
+	}
+	button.save_button, input.save_button {
+	background:linear-gradient(180deg, #53b700, #267515);
+	color:#fff;
+	}
+	input.search_button[type="submit"] {
+	height:2.65em;
 	}
 	address {
 	text-align:right;
@@ -173,15 +185,53 @@
 			<img src="icon-large-f.png" alt="mybang">
 		</h1>
 		<form action="./search.html" method="get">
-			<input type="text" name="q"><input type="submit" value="検索"><br>
+			<input type="text" name="q"><input type="submit" value="検索" class="search_button"><br>
 		</form>
 		<p>
-			または直接アクセス: <a href=
+			ブラウザーにmybangを追加: <a href="#add_to_webbrowser">追加方法</a>（設定保存より前に行うことをおすすめします）
+		</p>
+		<p>
+			URLに直接アクセス: <a href=
 			"search.html?q=%7BsearchTerms%7D"><span class="location_href"></span>search.html?q={searchTerms}</a>
 		</p>
 	</header>
 	<hr>
 	<main>
+		<h2>mybang</h2>
+		<textarea id="yourbangsjson" cols="100" rows="20"></textarea>
+		<h2>mybang名がなかった場合の動作</h2>
+		<label><input type="radio" name="defaultengine" value=
+		"ddg">DuckDuckGoで検索</label><br>
+		<label><input type="radio" name="defaultengine" value=
+		"google">Googleで検索</label><br>
+		<label><input type="radio" name="defaultengine" value=
+		"custom">指定するURLに移動</label><br>
+		<br>
+		指定するURL（検索キーワード部分を<code>%s</code>にして入力）:<br>
+		<input type="text" name="defaultenginecustom"><br>
+		<script>
+
+		document.getElementById('yourbangsjson').value = JSON.stringify(userdata_obj['mybangs'], null, 2);
+
+		let radio_btns = document.getElementsByName('defaultengine');
+		let len = radio_btns.length;
+		for (let i = 0; i < len; i++){
+			if (radio_btns.item(i).value == userdata_obj['defaultengine']){
+					radio_btns.item(i).checked = true;
+			}
+		}
+
+		document.getElementsByName('defaultenginecustom').item(0).value = userdata_obj['defaultengine_custom'];
+
+		</script>
+		<p>
+			<br>
+			<button onclick="save_button();" class="save_button">設定をすべて保存</button>
+		</p>
+		<p>
+			設定は全てこのブラウザー内にのみ保存され、サーバーには保存されません。
+		</p>
+		<hr>
 		<h2>
 			概要
 		</h2>
@@ -200,101 +250,43 @@
 			</li>
 		</ul>
 		<hr>
-		<h2>
-			設定
+		<h2 id="add_to_webbrowser">
+			ウェブブラウザーに登録
 		</h2>
+		<p>
+			mybangの設定をする前に、ウェブブラウザーにmybangを検索エンジンとして追加します。
+		</p>
+		<p>
+			<strong>Mozilla Firefox</strong>の場合、アドレスバーを右クリックすると、追加のためのボタンが表示されます。<br>
+		</p>
+		<p>
+			<img src="images/add-searchengine-firefox.png" alt="" style="width: 300px;" alt="Firefoxの場合">
+		</p>
+		<p>
+			<strong>Microsoft Edge等</strong>の場合、手動で追加します。「クエリの代わりに %s を使用した URL」を <code><span class="location_href"></span>search.html?q=%s</code> としてください。
+		</p>
+		<p>
+			<img src="images/add-searchengine-msedge.png" alt="" style="width: 350px;" alt="Microsoft Edge等の場合">
+		</p>
+		<hr />
+		<h2>設定の記述例</h2>
 		<h3>
-			1.mybangをつくる
+			mybang 
 		</h3>
 		<p>
 			"mybang名":"URL"のペアで、JSONで記述します。検索キーワード部分は<code>%s</code>としてください。
 		</p>
-		<textarea id="yourbangsjson" cols="100" rows="20"></textarea>
 		<pre class="mybangs_init"></pre>
 		<h3>
-			2.mybang名がなかった場合の動作を決める
-		</h3><label><input type="radio" name="defaultengine" value=
-		"ddg">DuckDuckGoで検索</label><br>
-		<label><input type="radio" name="defaultengine" value=
-		"google">Googleで検索</label><br>
-		<label><input type="radio" name="defaultengine" value=
-		"custom">指定するURLに移動</label><br>
-		<br>
-		指定するURL（検索キーワード部分を<code>%s</code>にして入力）:<br>
-		<input type="text" name="defaultenginecustom"><br>
+			mybang名がなかった場合の動作 &gt; 指定するURL
+		</h3>
 		<pre>
-＜参考＞
+＜例＞
 DuckDuckGo 過去1年間 - https://duckduckgo.com/?q=%s&ia=web&kl=jp-jp&df=y
 DuckDuckGo HTML版 - https://html.duckduckgo.com/html/?q=%s&kl=jp-jp
 DuckDuckGo lite版 - https://lite.duckduckgo.com/lite/?q=%s&kl=jp-jp
 Bing - https://www.bing.com/search?q=%s
 </pre>
-		<script>
-
-		document.getElementById('yourbangsjson').value = JSON.stringify(userdata_obj['mybangs'], null, 2);
-
-		let radio_btns = document.getElementsByName('defaultengine');
-		let len = radio_btns.length;
-		for (let i = 0; i < len; i++){
-			if (radio_btns.item(i).value == userdata_obj['defaultengine']){
-					radio_btns.item(i).checked = true;
-			}
-		}
-
-		document.getElementsByName('defaultenginecustom').item(0).value = userdata_obj['defaultengine_custom'];
-
-		</script>
-		<h3>
-			3.設定を保存する
-		</h3>
-		<p>
-			<button onclick="save_button();">設定をすべて保存</button>
-		</p>
-		<p>
-			設定は全てブラウザー内にのみ保存され、サーバーには保存されません（このブラウザーでしか使えません）。
-		</p>
-		<h3>
-			4.使う
-		</h3>
-		<p>
-			ウェブブラウザーに、mybangを検索エンジンとして追加することができます。（下記以外のブラウザーは普段使わないので、よくわかりません。お手数ですがお調べください）
-		</p>
-		<table>
-			<tbody>
-				<tr>
-					<th>
-						Mozilla Firefox
-					</th>
-					<td>
-						<p>
-							アドレスバーを右クリック、または検索バーを左クリックすると、追加のためのボタンが表示されます。
-						</p>
-					</td>
-				</tr>
-				<tr>
-					<th>
-						Microsoft Edge
-					</th>
-					<td>
-						<p>
-							色々やり方はあるようですが、手動で追加するのが確実です。以下のように追加してください。
-						</p>
-						<pre>
-検索エンジン: mybang ※なんでもいい
-キーワード: mybang ※なんでもいい
-クエリの代わりに %s を使用した URL: <span class="location_href"></span>search.html?q=%s
-</pre>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<h3>初期化（設定の削除）</h3>
-		<p>
-			<button onclick="clear_button();">設定をすべて削除</button>
-		</p>
-		<p>
-			このブラウザーに保存されているmybangの設定を全て削除します。初期化したい場合・mybangを今後利用しない場合に押してください。
-		</p>
 		<hr>
 		<h2>
 			ドキュメント
@@ -329,6 +321,14 @@ Bing - https://www.bing.com/search?q=%s
 		</h3>
 		<p>
 			設定によっては <a href="./search.html">search.html</a>へのリダイレクトがループする可能性があるため、ごく短い間隔でアクセスされた場合は処理を止めるようにしています。
+		</p>
+		<hr>
+		<h2>初期化（設定の削除）</h2>
+		<p>
+			<button onclick="clear_button();" class="remove">設定をすべて削除</button>
+		</p>
+		<p>
+			このブラウザーに保存されているmybangの設定を全て削除します。初期化したい場合・mybangを今後利用しない場合に押してください。
 		</p>
 	</main>
 	<hr>

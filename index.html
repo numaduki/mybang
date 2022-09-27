@@ -19,6 +19,7 @@
 	<script>
 
 	var
+		nice2meetu = false,
 		installed_url = location.href.substring(0, location.href.lastIndexOf('/') + 1),
 		userdata_obj = JSON.parse(localStorage.getItem('mybang_userdata', '')),
 		mybangs_init_obj = {"ｊ": "https://www.weblio.jp/content/%s","ｙ": "https://www.yodobashi.com/?word=%s","ｗ": "https://duckduckgo.com/?q=%s site:wikipedia.org&ia=web","!mybang": installed_url },
@@ -30,6 +31,7 @@
 		userdata_obj['mybangs'] = mybangs_init_obj;
 		userdata_obj['defaultengine'] = 'ddg';
 		userdata_obj['defaultengine_custom'] = '';
+		nice2meetu = true;
 	}
 
 	// 保存ボタン
@@ -113,7 +115,12 @@
 			});
 		}
 
-
+		if (nice2meetu) {
+			let tmp = document.getElementsByClassName('nice2meetu');
+			for (let i = 0; i < tmp.length; i ++) {
+				tmp.item(i).classList.add('true');
+			}
+		}
 
 	};
 
@@ -219,26 +226,56 @@
 	input[type="checkbox"]:checked + label + div.example_body {
 	display:block;
 	}
+	div.notice_nojs {
+		border:2px solid currentcolor;
+		padding:.5em 1em;
+	}
+	.nice2meetu {
+		display:none;
+		background-color: field;
+		color:FieldText;
+		padding: .25em 1em;
+		margin-bottom:2em;
+		border-radius:1em;
+		border-style: outset;
+	}
+	.nice2meetu.true { display:block;}
+	blockquote {
+		border:1px dashed currentcolor;
+		padding:1em;
+		border-radius:1em;
+	}
+	code {
+		background-color: field;
+		color:FieldText;
+		padding:.3em;
+		font-size: 1em
+	}
 	</style>
 
+	<noscript>
+		<div class="notice_nojs"><p>JavaScriptの実行が無効になっているようです。mybangはJavaScriptがないと動作しません。</p></div>
+	</noscript>
+
 	<header>
+
 		<h1>
 			<img src="icon-large-f.png" alt="mybang">
 		</h1>
+
+		<div class="nice2meetu">
+			<h2>mybangへようこそ！</h2>
+			<p>mybangを使うには、<a href="#startup">スタートアップ</a>の内容にしたがって、設定を完了してください。</p>
+		</div>
+
 		<form action="./search.html" method="get">
 			<input type="text" name="q"><input type="submit" value="検索" class="search_button"><br>
 		</form>
-		<p>
-			ブラウザーにmybangを追加: <a href="#add_to_webbrowser">追加方法</a>（設定保存より前に行うことをおすすめします）
-		</p>
-		<p>
-			URLに直接アクセス: <a href=
-			"search.html?q=%7BsearchTerms%7D"><span class="location_href"></span>search.html?q={searchTerms}</a>
-		</p>
+
 	</header>
 	<hr>
 	<main>
-		<h2>mybang</h2>
+		<h2 id="mybang_setting">mybang</h2>
 		<textarea id="yourbangsjson" cols="100" rows="20"></textarea>
 		<div class="example">
 			<input type="checkbox" id="cb1664256161172"> <label for="cb1664256161172">記述例を表示</label>
@@ -297,9 +334,12 @@ Bing - https://www.bing.com/search?q=%s
 			設定は全てこのブラウザー内にのみ保存され、サーバーには保存されません。
 		</p>
 		<hr>
-		<h2>
-			概要
+		<h2 id="startup">
+			スタートアップ
 		</h2>
+		<h3>
+			1. 概要
+		</h3>
 		<p>
 			自分で<a href="https://duckduckgo.com/">DuckDuckGo</a>の<a href="https://duckduckgo.com/bang">Bang</a>風のショートカットを作れます。<br>
 			ただし仕様が一部（というかかなり）異なります。
@@ -314,24 +354,27 @@ Bing - https://www.bing.com/search?q=%s
 			<li>mybang名にはマルチバイト文字も使えます。（「ｇ」「ぐ」でGoogle検索などが可能）
 			</li>
 		</ul>
-		<hr>
-		<h2 id="add_to_webbrowser">
-			ウェブブラウザーに登録
-		</h2>
+		<h3 id="add_to_webbrowser">
+			2. ウェブブラウザーに登録する
+		</h3>
 		<p>
-			mybangの設定をする前に、ウェブブラウザーにmybangを検索エンジンとして追加します。
+			mybangの設定をする前に、ウェブブラウザーにmybangを検索エンジンとして追加します。<br>
 		</p>
 		<p>
-			<strong>Mozilla Firefox</strong>の場合、アドレスバーを右クリックすると、追加のためのボタンが表示されます。<br>
+			OpenSearchに対応していますので、<strong>Mozilla Firefox</strong>では、アドレスバーを右クリックすると追加のためのボタンが表示されます。<br>
 		</p>
 		<p>
 			<img src="images/add-searchengine-firefox.png" alt="" style="width: 300px;" alt="Firefoxの場合">
 		</p>
+		<p>OpenSearchに対応していないブラウザーやソフトウェアの場合は、検索エンジンのURLとして、以下のURLを登録してください。（※<code>%s</code>という部分が検索キーワードになるようにしてください）</p><p><code><span class="location_href"></span>search.html?q=%s</code></p>
+		<h3>
+			3. 設定を行う
+		</h3>
 		<p>
-			<strong>Microsoft Edge等</strong>の場合、手動で追加します。「クエリの代わりに %s を使用した URL」を <code><span class="location_href"></span>search.html?q=%s</code> としてください。
+			<a href="#mybang_setting">ページ上部で設定</a>を行い、「設定をすべて保存」ボタンを押したら、準備完了です。<br>よくわからない場合は、とりあえず何も変更せずに「設定をすべて保存」ボタンを押せば大丈夫です。
 		</p>
 		<p>
-			<img src="images/add-searchengine-msedge.png" alt="" style="width: 350px;" alt="Microsoft Edge等の場合">
+			設定が終わったら、さっそくmybangで検索を行ってみてください。
 		</p>
 		<hr />
 		<h2>
